@@ -1,0 +1,212 @@
+<div class="centered-content">
+  <div class="store-view-container">
+    <!-- side bar -->
+    <div class="side-bar">
+      <h1 class="title has-text-primary">Filter</h1>
+      <h4 class="has-text-primary sub-text">
+        Filter with availability, zone & days
+      </h4>
+      <div class="list-menu">
+        <form #filterData="ngForm" (ngSubmit)="submit(filterData)">
+          <!-- item availability input field -->
+          <div class="form-group">
+            <label for="availabilityCount" class="labels"
+              >Availability Count</label
+            >
+            <input
+              type="number"
+              name="availabilityCount"
+              class="form-control list-menu-items"
+              aria-describedby="emailHelp"
+              placeholder="Enter availability count"
+              ngModel
+            />
+          </div>
+
+          <!-- Days open input field -->
+          <div class="form-group">
+            <label for="daysOpen" class="labels">Days Open</label>
+            <input
+              type="number"
+              name="daysOpen"
+              max="7"
+              class="form-control list-menu-items"
+              #name="ngModel"
+              placeholder="Enter Days open"
+              ngModel
+            />
+            <div
+              *ngIf="name.touched && name.invalid"
+              class="alert alert-danger"
+            >
+              7 days max
+            </div>
+          </div>
+
+          <!-- zone input field -->
+          <div class="form-group">
+            <label for="zone" class="labels">Zone</label>
+            <input
+              type="text"
+              #zone="ngModel"
+              name="zone"
+              class="form-control list-menu-items"
+              placeholder="Enter zone"
+              ngModel
+            />
+          </div>
+          <button type="submit" class="btn btn-primary labels">Submit</button>
+        </form>
+      </div>
+
+      <!-- Filer for lat and long -->
+      <div class="list-menu-sub">
+        <h4 class="sub-text has-text-primary">
+          Filter with latitude, Longitude
+        </h4>
+        <form #filterLLData="ngForm" (ngSubmit)="submitLatLong(filterLLData)">
+          <!-- lat input field -->
+          <div class="form-group">
+            <label for="latitude" class="labels">LATITUDE</label>
+            <input
+              type="text"
+              name="latitude"
+              required
+              #lat="ngModel"
+              class="form-control list-menu-items"
+              placeholder="Enter latitude"
+              ngModel
+            />
+            <div *ngIf="lat.touched && lat.invalid" class="alert alert-danger">
+              Field Mandatory
+            </div>
+          </div>
+
+          <!-- long input field -->
+          <div class="form-group">
+            <label for="longitude" class="labels">LONGITUDE</label>
+            <input
+              type="text"
+              name="longitude"
+              required
+              class="form-control list-menu-items"
+              #long="ngModel"
+              placeholder="Enter longitude"
+              ngModel
+            />
+            <div
+              *ngIf="long.touched && long.invalid"
+              class="alert alert-danger"
+            >
+              Field Mandatory
+            </div>
+          </div>
+
+          <!-- range input field -->
+          <div class="form-group">
+            <label for="longitude" class="labels">Closest</label>
+            <select
+              name="closest"
+              class="form-control list-menu-items"
+              #closest="ngModel"
+              ngModel
+              required
+            >
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="100">100</option>
+            </select>
+            <div
+              *ngIf="closest.touched && closest.invalid"
+              class="alert alert-danger"
+            >
+              Field Mandatory
+            </div>
+          </div>
+          <button
+            type="submit"
+            [disabled]="filterLLData.invalid"
+            class="btn btn-primary labels"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Filtered information table -->
+    <div class="store-list-container">
+      <h1 class="title has-text-primary">Filtered Data</h1>
+      <div class="list-menu">
+        <table
+          mat-table
+          matTableExporter
+          class="display-table mat-elevation-z8"
+          [dataSource]="stores"
+          #exporter="matTableExporter"
+        >
+          <!-- store ID column -->
+          <ng-container matColumnDef="storeID">
+            <th mat-header-cell *matHeaderCellDef>Store ID</th>
+            <td mat-cell *matCellDef="let stores">{{ stores.STORE_ID }}</td>
+          </ng-container>
+
+          <!-- lat column -->
+          <ng-container matColumnDef="lat">
+            <th mat-header-cell *matHeaderCellDef>LATITUDE</th>
+            <td mat-cell *matCellDef="let stores">{{ stores.LATITUDE }}</td>
+          </ng-container>
+
+          <!-- long column -->
+          <ng-container matColumnDef="long">
+            <th mat-header-cell *matHeaderCellDef>LONGITUDE</th>
+            <td mat-cell *matCellDef="let stores">{{ stores.LONGITUDE }}</td>
+          </ng-container>
+
+          <!-- maps column -->
+          <ng-container matColumnDef="view">
+            <th mat-header-cell *matHeaderCellDef>VIEW</th>
+            <td
+              mat-cell
+              *matCellDef="let stores"
+              [routerLink]="['maps', stores]"
+            >
+              View in Maps
+              <mat-icon class="table_icon" color="accent">pin_drop</mat-icon>
+            </td></ng-container
+          >
+
+          <!-- table rows -->
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let stores; columns: displayColumns"></tr>
+        </table>
+      </div>
+
+      <div>
+        <!-- upload button -->
+        <label class="btn btn-primary download-button">
+          <input
+            type="file"
+            #fileImportInput
+            [accept]="requiredFileType"
+            (change)="fileChangeListener($event, $any($event.target).files)"
+          />
+          Upload File
+        </label>
+
+        <!-- download button -->
+        <button
+          [disabled]="stores.length == 0"
+          class="btn btn-primary download-button"
+          mat-raised-button
+          (click)="exporter.exportTable('csv', { fileName: 'Filtered_Data' })"
+        >
+          Download
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
